@@ -1,0 +1,24 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: project-repo
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  url: https://github.com/mazemadnemesio/journey.git
+  ref:
+    branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: nginx-webpage
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: "./k8s/base"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: project-repo
+  targetNamespace: default
