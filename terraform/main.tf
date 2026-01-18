@@ -25,10 +25,7 @@ resource "google_container_cluster" "primary" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  node_config {
-    disk_size_gb = 20 # Minimum possible to save quota
-    machine_type = "e2-micro"
-  }
+
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
@@ -76,7 +73,7 @@ resource "google_artifact_registry_repository" "my_repo" {
 
 # Workload Identity Pool for GitHub
 resource "google_iam_workload_identity_pool" "github_pool" {
-  workload_identity_pool_id = "github-pool"
+  workload_identity_pool_id = "github-pool-final"
   display_name              = "GitHub Pool"
 }
 

@@ -62,6 +62,25 @@ gcloud container clusters get-credentials "senior-devops-cluster" --region "$GCP
 # 4. Flux CD Bootstrap
 echo ""
 echo "🌊 Bootstrapping Flux CD via GitOps..."
+
+
+# Dynamic Manifest Update
+# Replaces the URL in the GitRepository manifest with the user's repo.
+echo "🔧 Configuring Flux GitRepository URL..."
+FLUX_MANIFEST="./k8s/clusters/production/nginx-app.yaml"
+# Ensure we point to the correct repo
+sed -i "s|url: .*|url: https://github.com/${GITHUB_REPO_FULL}.git|g" "$FLUX_MANIFEST"
+# Rename 'podinfo' to 'project-repo' for clarity
+sed -i "s|name: podinfo|name: project-repo|g" "$FLUX_MANIFEST"
+
+echo "💾 Committing manifest changes to Git..."
+git add "$FLUX_MANIFEST"
+# We commit only if there are changes to avoid empty commit errors
+git diff-index --quiet HEAD || git commit -m "Configure Flux GitRepository URL for ${GITHUB_REPO_FULL}"
+git push origin main || echo "⚠️ Could not push to main. If using a personal repo, ensure you have permissions."
+
+
+
 flux bootstrap github \
   --owner="$GITHUB_USER" \
   --repository="$GITHUB_REPO_NAME" \
