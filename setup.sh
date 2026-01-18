@@ -27,7 +27,7 @@ prompt_var() {
 # 1. Gather Information
 echo "TIP: For Qwiklabs, check the lab instructions for the allowed region (e.g., us-east1, us-east4, us-west1)."
 prompt_var "GCP_PROJECT_ID" "Enter your GCP Project ID" "my-project-id"
-prompt_var "GCP_REGION" "Enter GCP Region" "us-central1"
+prompt_var "GCP_REGION" "Enter GCP Region" "us-east1"
 prompt_var "GITHUB_USER" "Enter your GitHub Username" "my-user"
 prompt_var "GITHUB_REPO_NAME" "Enter your GitHub Repository Name" "proyecto_entrevista"
 prompt_var "GITHUB_TOKEN" "Enter your GitHub Personal Access Token (Repo scope)" ""

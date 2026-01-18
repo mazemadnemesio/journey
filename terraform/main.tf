@@ -52,6 +52,8 @@ resource "google_container_node_pool" "primary_nodes" {
     }
 
     machine_type = "e2-medium"
+    disk_size_gb = 50
+    disk_type    = "pd-balanced"
     tags         = ["gke-node", "${var.cluster_name}-gke"]
     metadata = {
       disable-legacy-endpoints = "true"
@@ -83,7 +85,7 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
     "attribute.actor"      = "assertion.actor"
     "attribute.repository" = "assertion.repository"
   }
-  attribute_condition = "assertion.repository == \"${var.github_repo}\""
+  attribute_condition = "attribute.repository == \"${var.github_repo}\""
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
