@@ -58,3 +58,60 @@ resource "google_container_node_pool" "primary_nodes" {
     }
   }
 }
+
+# Artifact Registry for Docker images
+resource "google_artifact_registry_repository" "my_repo" {
+  location      = var.region
+  repository_id = "my-repo"
+  description   = "Docker repository for nginx-webpage"
+  format        = "DOCKER"
+}
+
+# Workload Identity Pool for GitHub
+resource "google_iam_workload_identity_pool" "github_pool" {
+  workload_identity_pool_id = "github-pool"
+  display_name              = "GitHub Pool"
+}
+
+# Workload Identity Provider for GitHub
+resource "google_iam_workload_identity_pool_provider" "github_provider" {
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = "github-provider"
+  display_name                       = "GitHub Provider"
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.actor"      = "assertion.actor"
+    "attribute.repository" = "assertion.repository"
+  }
+  oidc {
+    issuer_uri = "https://token.actions.githubusercontent.com"
+  }
+}
+
+# Service Account for GitHub Actions
+resource "google_service_account" "github_actions" {
+  account_id   = "github-actions"
+  display_name = "GitHub Actions Service Account"
+}
+
+# Allow GitHub Actions to use WIF
+resource "google_service_account_iam_member" "wif_user" {
+  service_account_id = google_service_account.github_actions.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_repo}"
+}
+
+# Grant Service Account permissions to Artifact Registry
+resource "google_artifact_registry_repository_iam_member" "repo_pusher" {
+  location   = google_artifact_registry_repository.my_repo.location
+  repository = google_artifact_registry_repository.my_repo.name
+  role       = "roles/artifactregistry.writer"
+  member     = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# Grant Service Account permissions to GKE
+resource "google_project_iam_member" "gke_developer" {
+  project = var.project_id
+  role    = "roles/container.developer"
+  member  = "serviceAccount:${google_service_account.github_actions.email}"
+}

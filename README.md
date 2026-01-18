@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Senior DevOps Stack Setup
 
 Este repositorio contiene todo lo necesario para desplegar un ambiente de Kubernetes profesional en GCP utilizando herramientas modernas de DevOps.
@@ -51,6 +50,3 @@ Para que Flux CD pueda sincronizar tu código, necesitas configurar tus credenci
 - **K8s Best Practices**: HPA, PDB, Probes, Resource Quotas.
 - **Flux CD**: Sincronización automática vía GitOps.
 - **GitHub Actions**: Pipeline de CI para build y test.
-=======
-# nginx
->>>>>>> 58b6335a75d139c02fdd65c5203a77836f231810
